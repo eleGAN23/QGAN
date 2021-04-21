@@ -1,7 +1,7 @@
 # QGAN
 Official PyTorch repository for [Quaternion Generative Adversarial Networks](https://arxiv.org/pdf/2104.09630.pdf).
 
-Eleonora Grassucci, Edoardo Cicero, Danilo Comminiello
+Eleonora Grassucci, Edoardo Cicero, Danilo Comminiello, "Quaternion Generative Adversarial Networks", arXiv preprint: arXiv:2104.09630v1, Apr. 2021.
 
 ### Abstract
 
