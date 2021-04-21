@@ -11,11 +11,12 @@ Latest Generative Adversarial Networks (GANs) are gathering outstanding results 
 
 Summary parameters and memory results for SNGAN and QSNGAN.
 
-| Model  | # Total parameters | Disk Memory$$^*$$ |
-|--------|:------------------:|:---------------:|
-| SNGAN  |     61,173,000     |  $$\sim$$ 115 GB  |
-| QSNGAN |     16,896,105     |   $$\sim$$ 35 GB  |
-|        |                    |                 |
+| Model  | # Total parameters | Disk Memory* |
+|--------|:------------------:|:---------:|
+| SNGAN  |     61,173,000     |   115 GB  |
+| QSNGAN |     16,896,105     |   35 GB   |
+
+* Memory required by the generator checkpoint for inference.
 
 Samples generated from the real-valued SNGAN on the left and from the proposed Quaternion-valued QSNGAN on the right on the CelebA-HQ dataset and 102 Oxford Flowers dataset.
 
