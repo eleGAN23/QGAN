@@ -10,10 +10,16 @@ Latest Generative Adversarial Networks (GANs) are gathering outstanding results 
 ### Results
 Samples generated from the real-valued SNGAN on the left and from the proposed Quaternion-valued QSNGAN on the right on the CelebA-HQ dataset and 102 Oxford Flowers dataset.
 
-<img src="./samples/CelebAHQ-SNGAN.png" width="450" height="450"/>          <img src="./samples/CelebAHQ-QSNGAN_QSN.png" width="450" height="450"/>
+<img src="./samples/CelebAHQ-SNGAN.png" width="350" height="350"/>          <img src="./samples/CelebAHQ-QSNGAN_QSN.png" width="350" height="350"/>
 
-<img src="./samples/flowers-SNGAN.png" width="450" height="450"/>          <img src="./samples/flowers-QSNGAN_QSN.png" width="450" height="450"/>
+<img src="./samples/flowers-SNGAN.png" width="350" height="350"/>          <img src="./samples/flowers-QSNGAN_QSN.png" width="350" height="350"/>
 
 
 ### Training
 
+Training can beperformed through:
+```python
+python Qmain_FromText.py --TextArgs=*choose-the-txt-file*
+```
+
+`SNGAN_128.txt` and `QSNGAN_128.txt` contain the configurations and options for training. Download the dataset and set the name and the path in the `.txt` file. Images are resized by default to 128x128.
