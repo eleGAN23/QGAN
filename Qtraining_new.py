@@ -48,12 +48,11 @@ class Pad():
 
 class Trainer():
     def __init__(self, generator, discriminator, gen_optimizer, dis_optimizer,
-                 weight_rotation_loss_d, weight_rotation_loss_g, loss='hinge', gp_weight=10, critic_iterations=2, print_every=50,
+                 loss='hinge', gp_weight=10, critic_iterations=2, print_every=50,
                  use_cuda=True,
                  gpu_num=1,
                  save_FID=False,
                  FIDPaths = ['generated_images','real_images'],
-                 ssup=False,
                  checkpoint_folder='checkpoints',
                  FIDevery = 500,
                  FIDImages = 100,
@@ -67,15 +66,13 @@ class Trainer():
         self.G_opt = gen_optimizer
         self.D = discriminator
         self.D_opt = dis_optimizer
-        self.losses = {'LossG': [], 'LossD': [], 'GP': [], 'RotationG': [], 'RotationD': []}
+        self.losses = {'LossG': [], 'LossD': [], 'GP': []}
         self.num_steps = 0
         self.use_cuda = use_cuda
         self.gpu_num = gpu_num
         self.gp_weight = gp_weight
         self.critic_iterations = critic_iterations
         self.print_every = print_every
-        self.weight_rotation_loss_d = weight_rotation_loss_d
-        self.weight_rotation_loss_g = weight_rotation_loss_g
 
 #         if self.use_cuda:
         device = torch.device('cuda:%i' %gpu_num if torch.cuda.is_available() and self.use_cuda else 'cpu')
@@ -97,10 +94,9 @@ class Trainer():
         self.plot_images = plot_images # plot images during training
         self.normalize = normalize
         
-        self.tracked_info = {'Epochs': 0, 'Iterations': 0, 'LossG': [], 'LossD': [], 'GP': [], 'FID': [], 'EpochFID': [], 'RotationG': [], 'RotationD': []}
+        self.tracked_info = {'Epochs': 0, 'Iterations': 0, 'LossG': [], 'LossD': [], 'GP': [], 'FID': [], 'EpochFID': []}
         self.checkpoint_folder = checkpoint_folder
-        self.ssup = ssup
-        
+       
         
         self.QNet = ('Q' in self.G.__class__.__name__ ) # check if network is Quaternionic
         
@@ -122,8 +118,8 @@ class Trainer():
       
         
         # info about Gen to put in folder's name or file name        
-        self.Generator_info = self.G.__class__.__name__ + '_BN-{}_SN-{}_SSUP-{}'.format(
-            self.G.batch_normed, hasattr(self.D, 'spectral_normed') and self.D.spectral_normed, self.ssup)
+        self.Generator_info = self.G.__class__.__name__ + '_BN-{}_SN-{}'.format(
+            self.G.batch_normed, hasattr(self.D, 'spectral_normed') and self.D.spectral_normed)
         
         # update generated images fid path
         self.FIDPaths[0] = str(self.FIDPaths[0]) + str(self.Generator_info)
@@ -135,9 +131,9 @@ class Trainer():
             os.makedirs(dir_gen)
             
             
-        print('\nQuaternion Model = {}\nGenerator, Discriminator = {} and {}\nloss = {}\nSelf-Supervised = {}\nBatch Normalization = {}\
+        print('\nQuaternion Model = {}\nGenerator, Discriminator = {} and {}\nloss = {}\nBatch Normalization = {}\
                \nSpectral Normalization = {}\n'.format(self.QNet,
-              self.G.__class__.__name__, self.D.__class__.__name__, self.selected_loss, self.ssup, self.G.batch_normed,
+              self.G.__class__.__name__, self.D.__class__.__name__, self.selected_loss, self.G.batch_normed,
                   hasattr(self.D, 'spectral_normed') and self.D.spectral_normed ==True))
         
         time.sleep(5)
@@ -146,27 +142,17 @@ class Trainer():
     def _critic_train_iteration(self, data, generated_data, batch_size):
         """ Compute Discriminator Loss and Optimize """
         # Calculate probabilities on real and generated data
-        # data divided in upright and rotated    
-        # take first batch corresponding to the total images if the network is not self-supervised
-        # or corresponding to the upright images if the network is self-supervised
         self.D.zero_grad()            
 
             
-        else:
-            if self.selected_loss != 'classic':
-                all_data = torch.cat([data, generated_data], dim=0)
-    
-                sigmoid, logits = self.D(all_data)
-                
-                d_real_sigmoid, g_fake_sigmoid = torch.chunk(sigmoid, 2)
-                d_real_logits, g_fake_logits = torch.chunk(logits, 2)
-            
-#             print("[D real: %f][D fake: %f]" %(torch.mean(d_real_sigmoid), torch.mean(g_fake_sigmoid)))
-                
-            
-                
+        if self.selected_loss != 'classic':
+            all_data = torch.cat([data, generated_data], dim=0)
 
-
+            sigmoid, logits = self.D(all_data)
+            
+            d_real_sigmoid, g_fake_sigmoid = torch.chunk(sigmoid, 2)
+            d_real_logits, g_fake_logits = torch.chunk(logits, 2)
+            
         if self.gp_weight > 0:
             data_up = data[0:batch_size]
             generated_data_up = generated_data[0:batch_size]
@@ -181,7 +167,6 @@ class Trainer():
             d_loss = torch.mean(g_fake_logits) - torch.mean(d_real_logits) 
             
         elif self.selected_loss== 'hinge':
-            # print('d_real_pro_logits shape', d_real_pro_logits.shape)
             d_loss = torch.mean(nn.ReLU()(1.0 - d_real_logits.view(-1))) + torch.mean(nn.ReLU()(1.0 + g_fake_logits.view(-1)))
             
         elif self.selected_loss== 'classic':
@@ -288,7 +273,7 @@ class Trainer():
             self.num_steps += 1
 
             
-            # Update Discriminator (excluding rotated generated images)
+            # Update Discriminator
             self._critic_train_iteration(data, generated_data.detach(), batch_size)
             
             # Only update generator every |critic_iterations| iterations
@@ -418,11 +403,11 @@ class Trainer():
         gen_path = folder + gen_name
         disc_path = folder + disc_name
         
-        torch.save(self.G.state_dict(), gen_path + '_epoch{}'.format(self.epoch) + '_BN-{}_SN-{}_SS-{}_ImgNorm-{}_{}'.format(
-            self.G.batch_normed, hasattr(self.D, 'spectral_normed') and self.D.spectral_normed ==True, self.ssup, self.normalize, date) + '.pt')
+        torch.save(self.G.state_dict(), gen_path + '_epoch{}'.format(self.epoch) + '_BN-{}_SN-{}_ImgNorm-{}_{}'.format(
+            self.G.batch_normed, hasattr(self.D, 'spectral_normed') and self.D.spectral_normed ==True, self.normalize, date) + '.pt')
         
-        torch.save(self.D.state_dict(), disc_path + '_epoch{}'.format(self.epoch) + '_BN-{}_SN-{}_SS-{}_ImgNorm-{}_{}'.format(
-            self.G.batch_normed, hasattr(self.D, 'spectral_normed') and self.D.spectral_normed ==True, self.ssup, self.normalize, date) + '.pt')
+        torch.save(self.D.state_dict(), disc_path + '_epoch{}'.format(self.epoch) + '_BN-{}_SN-{}_ImgNorm-{}_{}'.format(
+            self.G.batch_normed, hasattr(self.D, 'spectral_normed') and self.D.spectral_normed ==True, self.normalize, date) + '.pt')
         
 
 

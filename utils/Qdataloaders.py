@@ -47,29 +47,6 @@ def preprocessing(quat_data, img_size, normalize):
         return transforms.Compose(lista)
 
 
-
-
-# def CelebA_dataloader(root, quat_data, img_size, normalize, batch_size, num_workers=cpu_count()):
-#     """CelebA dataloader with resized and normalized images."""
-#     name = 'CelebA'
-#     dataset = datasets.ImageFolder(root=root,
-#                                     transform=preprocessing(quat_data, img_size, normalize)
-#                                     )
-#     # Create the dataloader
-#     train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
-#                                               shuffle=True, num_workers=num_workers)
-
-
-    
-#     test_loader = '_'
-    
-#     return train_loader, test_loader, name
-
-
-
-
-
-
 #-----------------------------------------------------------------------------------------------------------#
 
 class ARRange(object):
@@ -284,34 +261,26 @@ def CelebA_dataloader2(root, quat_data, img_size, normalize, batch_size, num_wor
     test_loader = '_'
     
     return train_loader, test_loader, name   
-
-
+   
 #----------------------------------------------------------------------------------------------------#
 
-'''LSUN'''
+'''102flowers'''
 
-def LSUN_dataloader(root, quat_data, img_size, normalize, batch_size, num_workers=2, train_class='bedroom_train'):
-    """LSUN_Bedroom dataloader with resized and normalized images."""
-    name = 'LSUN ' +' '.join(train_class.split('_')[:-1])
+def Flowers_dataloader(root, quat_data, img_size, normalize, batch_size, num_workers=2, eval=False):
+    """102 Oxford Flowers dataloader with resized and normalized images."""
+    name = '102 Oxfrod Flowers'
     print('Dataset:', name)
-    
-    dataset = datasets.LSUN(root= root, classes=['bedroom_train'],
-            transform = preprocessing2(quat_data, img_size, normalize))
+    if not eval:
+        dataset = datasets.ImageFolder(root=root, transform=preprocessing2(quat_data, img_size, normalize))
+        print('Samples:', dataset.__len__())
+        print()
+        print('Preprocessing:\n', dataset.transform)
+        # Create the dataloader
 
-                             
-    print('Samples:', dataset.__len__())
-    print()
-    print('Preprocessing:\n', dataset.transform)
-    # Create the dataloader
-    train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
-                                              shuffle=True, num_workers=num_workers)
+        train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+        test_loader = '_'
 
-
-    
-    test_loader = '_'
-    
-    return train_loader, test_loader, name   
-
+        return train_loader, test_loader, name  
 
 #----------------------------------------------------------------------------------------------------#
 
@@ -344,291 +313,3 @@ def CIFAR10_dataloader(root, quat_data, img_size, normalize, batch_size, num_wor
         test_loader = '_'
         return train_loader, test_loader, name   
 
-    test_root = "C:/Users/eleon/Documents/Dottorato/Code/QRotGAN/CIFAR/data/Test_FID_cifar"
-    if eval:
-        dataset_test = datasets.CIFAR10(root=test_root, download= True, train=False,
-                                    transform = preprocessing_HQ(quat_data=False, img_size=32, normalize=False))
-        test_loader = torch.utils.data.DataLoader(dataset_test, batch_size=1, shuffle=False)
-
-        # for i, (data, _) in enumerate(test_loader):
-        #     # print(data.size())
-        #     # print(data)
-        #     # break
-        #     plt.ioff()
-        #     plt.axis("off")
-        #     imgs = data[0].permute(1,2,0)
-        #     img_path = test_root + str(i) + '.png'
-        #     plt.imsave(img_path, imgs.numpy())
-
-
-
-        # with open("C:/Users/eleon/Documents/Dottorato/Code/QRotGAN/CIFAR/data/Test_FID_cifar/cifar-10-batches-py/test_batch", 'rb') as fo:
-        #     test_dict = pickle.load(fo, encoding='bytes')
-        # for elem in test_dict:
-        #     # print(elem.shape)
-        #     print(elem)
-        #     img = Image.fromarray(elem[1], 'RGB')
-        #     img.save("C:/Users/eleon/Documents/Dottorato/Code/QRotGAN/CIFAR/data/Test_FID_cifar/test_cifar")
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# --------------------------------------- Dataloader for colab ------------------------------------------- #
-
-import h5py
-# from PIL import Image
-import io
-
-class dataset_h5(torch.utils.data.Dataset):
-    def __init__(self, root,  transform=None):
-        super(dataset_h5, self).__init__()
-        
-        self.transform = transform
-        
-        self.in_file = root
-        # self.resize_dim = resize_dim
-        self.len = len(list(h5py.File(self.in_file, 'r')['..']['data']['celebA_Train']['Train'].keys()))
- 
-    def open_hdf5(self):
-        
-        self.file = h5py.File(self.in_file, 'r')
-        self.dataset = self.file['..']['data']['celebA_Train']['Train']
-        self.keys = list(self.file['..']['data']['celebA_Train']['Train'].keys())
-        self.len = len(self.keys)
-
-
-    def __getitem__(self, index):
-        if not hasattr(self, 'file'):
-            self.open_hdf5()
-
-        x = self.dataset[self.keys[index]]
-        x =  Image.open(io.BytesIO(np.array(x)))
-        
-        # Preprocessing each image
-        if self.transform is not None:
-            x = self.transform(x)
-            
-        return x, '_'
- 
-    def __len__(self):
-        return self.len 
-
-
-def CelebA_colab_dataloader(root, quat_data, img_size, normalize, batch_size, num_workers=2):
-    """CelebA dataloader for hdf5 dataset."""
-    name = 'CelebA'
-    # print(root)
-    dataset = dataset_h5(root=root,
-                             transform=preprocessing2(quat_data, img_size, normalize)
-                             )
-    # Create the dataloader
-    train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
-                                              shuffle=True, num_workers=num_workers)
-
-
-    test_loader = '_'
-    
-    return train_loader, test_loader, name
-    
-# def get_QCelebA_dataloader(root, batch_size, img_size, num_workers=cpu_count()):
-#     """CelebA dataloader with resized images."""
-#     name = 'CelebA'
-#     dataset = datasets.ImageFolder(root=root,
-#                                     transform=transforms.Compose([
-#                                     transforms.Resize(img_size),
-#                                     transforms.CenterCrop(img_size),
-#                                     transforms.ToTensor(),
-#                                     Pad(),
-#                                     # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-#                                 ]))
-#     # Create the dataloader
-#     train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
-#                                               shuffle=True, num_workers=num_workers)
-
-
-    
-#     test_loader = '_'
-    
-#     return train_loader, test_loader, name
-
-
-
-
-
-# def get_CelebA_QGAN_dataloader(root, batch_size, img_size, num_workers=cpu_count()):
-#     """CelebA dataloader for quaternion networks"""
-#     name = 'Q_CelebA'
-#     dataset = datasets.ImageFolder(root=root,
-#                                     transform=transforms.Compose([
-#                                     transforms.Resize(img_size),
-#                                     transforms.CenterCrop(img_size),
-#                                     transforms.ToTensor(),
-#                                     # Pad(),
-#                                     # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-#                                 ]))
-#     # Create the dataloader
-#     train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
-#                                               shuffle=True, num_workers=num_workers)
-
-
-    
-#     test_loader = '_'
-    
-#     return train_loader, test_loader, name
-
-
-
-
-# def get_CelebA_Rot_dataloader(root, batch_size=128, img_size = 128, num_workers=cpu_count()):
-#     """CelebA dataloader with (32, 32) sized images."""
-#     name = 'CelebA'
-#     dataset = datasets.ImageFolder(root=root,
-#                                    transform=transforms.Compose([
-#                                    transforms.Resize(146),
-#                                    transforms.RandomCrop(128),
-#                                    # Pad(),
-#                                    transforms.ToTensor(),
-#                                    # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-#                                ]))
-#     # Create the dataloader
-#     train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
-#                                              shuffle=True, num_workers=num_workers)
-    
-#     # test_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
-#                                              # shuffle=True)
-
-
-    
-#     test_loader = '_'
-    
-#     return train_loader, test_loader, name
-
-
-
-
-
-
-# class QCelebaDataset(torch.utils.data.Dataset):
-    
-#     def __init__(self, img_size, transform=None):
-#         self.root_dir = './data/celeba/img_align_celeba/Train/Train_celeba'
-        
-#         self.im_list = os.listdir(self.root_dir)
-#         # print(self.im_list)
-#         self.resize_dim = (img_size,img_size)
-#         if transform==None:
-#             self.transform = transforms.Compose([
-#                                         transforms.ToPILImage(float),
-#                                         transforms.Resize(img_size),
-#                                         transforms.CenterCrop(img_size),
-                                        
-#                                         transforms.ToTensor(),
-#                                         ImagePad(),
-#                                         # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-#                                     ])
-#         else:
-#             self.transform = transform
-
-#     def __len__(self):
-#         return len(self.im_list)
-
-#     def __getitem__(self, idx):
-#         im = Image.open(os.path.join(self.root_dir, self.im_list[idx]))
-#         im = np.array(im)
-#         im = im / 255
-
-#         if self.transform:
-#             im = self.transform(im)
-
-#         # Manipulation for quaternion net
-#         # npad  = ((1, 0), (0, 0), (0, 0))
-#         # im = np.pad(im, pad_width=npad, mode='constant', constant_values=0)
-#         return im
-    
-    
-    
-# class CelebaDataset(torch.utils.data.Dataset):
-    
-#     def __init__(self, root_dir,img_size, transform=None):
-#         self.root_dir = root_dir
-#         self.im_list = os.listdir()
-#         self.resize_dim = img_size
-#         if transform==None:
-#             self.transform = transforms.Compose([
-#                                         transforms.Resize(img_size),
-#                                         transforms.CenterCrop(img_size),
-#                                         # ImagePad(),
-#                                         transforms.ToTensor(),
-#                                         # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-#                                     ])
-#         else:
-#             self.transform = transform
-
-#     def __len__(self):
-#         return len(self.im_list)
-
-#     def __getitem__(self, idx):
-#         im = Image.open(os.path.join(self.root_dir, self.im_list[idx])).resize(self.resize_dim, resample=PIL.Image.NEAREST)
-#         im = np.array(im)
-#         im = im / 255
-
-#         if self.transform:
-#             im = self.transform(im)
-
-#         # Manipulation for quaternion net
-#         # npad  = ((1, 0), (0, 0), (0, 0))
-#         # im = np.pad(im, pad_width=npad, mode='constant', constant_values=0)
-#         return im
-    
-    
-    
-    
-# def QCelebaLoader(batch_size=64, img_size = 64):
-#     """CelebA dataloader with (32, 32) sized images."""
-#     name = 'CelebA'
-#     dataset = QCelebaDataset(img_size)
-#     # Create the dataloader
-#     train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
-#                                              shuffle=True)
-    
-#     # test_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
-#                                              # shuffle=True)
-
-
-    
-#     test_loader = '_'
-    
-#     return train_loader, test_loader, name

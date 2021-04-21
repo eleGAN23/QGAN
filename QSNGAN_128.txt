@@ -6,7 +6,6 @@
 --Dataset=CelebAHQ_GAN
 
 --loss=hinge
---ssup=False
 --normalize=True
 
 --batch_size=64
@@ -21,8 +20,6 @@
 --crit_iter=5
 --noise_dim=128
 --gp_weight=0
---weight_rot_D=0
---weight_rot_G=0
 
 --print_every=1000
 --save_FID=False

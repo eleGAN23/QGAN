@@ -10,15 +10,8 @@ import argparse
 import torch
 import torch.optim as optim
 # from utils.Qdataloaders import get_CelebA_QDCGAN_dataloader, get_CelebA_DCGAN_dataloader
-from utils.Qdataloaders import  CelebA_dataloader2, CelebA_colab_dataloader, CelebAHQ_dataloader, LSUN_dataloader
+from utils.Qdataloaders import  CelebA_dataloader2, CelebA_colab_dataloader, CelebAHQ_dataloader, LSUN_dataloader, Flowers_dataloader
 from utils.Qdataloaders import CIFAR10_dataloader
-
-# from Qmodel import Generator, Discriminator, Simple_Discriminator, Simple_Generator
-# from Qmodel import DCGAN_Generator, DCGAN_Discriminator
-# from models.QRotGAN_32 import QRotGAN_G32, QRotGAN_D32
-# from models.QRotGAN_128 import QRotGAN_G128, QRotGAN_D128
-# from models.Q_DCGAN_64 import DCGAN_Discriminator, DCGAN_Generator, QDCGAN_Discriminator, QDCGAN_Generator
-# from models.Test_QGAN import QGANLastConv_D, QGANLastConv_G
 
 from Qtraining_new import Trainer
 # from torch import nn
@@ -42,8 +35,7 @@ if __name__ == '__main__':
     parser.add_argument('--image_size', type=int, default=64)
     parser.add_argument('--normalize', type=bool, default=False, help='map value of images from range [0,255] to range [-1,1]')
     
-    parser.add_argument('--model', type=str, default='DCGAN_64', help='Models: DCGAN_64, QDCGAN_64, SSGAN_32, QSSGAN_32, SSGAN_128, QSSGAN_128')
-    parser.add_argument('--ssup', type=bool, default=False, help='Old option, set it False')
+    parser.add_argument('--model', type=str, default='DCGAN_64', help='Models: SNGAN_32, QSNGAN_QSN_32, SNGAN_128, QSNGAN_128_QSN')
     parser.add_argument('--noise_dim', type=int, default=128)
     parser.add_argument('--BN', type=bool, default=False, help='Apply Batch Normalization')
     parser.add_argument('--SN', type=bool, default=False, help='Apply Spectral Normalization')    
@@ -57,8 +49,6 @@ if __name__ == '__main__':
     
     parser.add_argument('--crit_iter', type=int, default=1, help='critic iteration') 
     parser.add_argument('--gp_weight', type=int, default=0, help='[1,10] for SSGAN, default=0')
-    parser.add_argument('--weight_rot_D', type=float, default=0, help='1.0 for SSGAN, default=0')
-    parser.add_argument('--weight_rot_G', type=float, default=0, help='0.2 for SSGAN, default=0')
     
     parser.add_argument('--print_every', type=int, default=50, help='Print Gen and Disc Loss every n iterations')
     parser.add_argument('--plot_images', type=bool, default=True, help='Plot images during training')
@@ -79,9 +69,6 @@ if __name__ == '__main__':
     loss = opt.loss
     critic_iterations = opt.crit_iter  # [1, 2]
     gp_weight = opt.gp_weight         # [1, 10]
-    ssup = opt.ssup
-    weight_rotation_loss_d = opt.weight_rot_D    #1.0
-    weight_rotation_loss_g = opt.weight_rot_G   #0.2
     
     lr = opt.lr
     betas = opt.betas.replace(',', ' ').split()
@@ -128,8 +115,8 @@ if __name__ == '__main__':
     
     train_dir = opt.train_dir
     normalize = opt.normalize
-    # print(model, BN, SN, ssup)
-    generator, discriminator = GetModel(str_model=model, z_size=noise_dim, BN=BN, SN = SN, ssup=ssup)
+    # print(model, BN, SN)
+    generator, discriminator = GetModel(str_model=model, z_size=noise_dim, BN=BN, SN = SN)
     
     G_params= sum(p.numel() for p in generator.parameters() if p.requires_grad)
     print('G parameters:', G_params)
@@ -159,8 +146,9 @@ if __name__ == '__main__':
     elif dataset == 'CIFAR10':
         data_loader, _ , data_name = CIFAR10_dataloader(root=train_dir, quat_data = quat_data, normalize=normalize, batch_size=batch_size, img_size=img_size, num_workers=n_workers)
 
-    # elif dataset == 'CelebA_128':
-    #     data_loader, _ , data_name = get_CelebA_Rot_dataloader(root=opt.train_dir, batch_size=batch_size, img_size=img_size, num_workers=2)
+    elif dataset == '102flowers':
+        data_loader, _ , data_name = Flowers_dataloader(root=train_dir, quat_data = quat_data, normalize=normalize, batch_size=batch_size, img_size=img_size, num_workers=n_workers)
+
     else:
         RuntimeError('Wrong dataset or not implemented')
     
@@ -181,14 +169,12 @@ if __name__ == '__main__':
     
     '''Train model'''
     trainer = Trainer(generator, discriminator, G_optimizer, D_optimizer,
-                      weight_rotation_loss_d = weight_rotation_loss_d, weight_rotation_loss_g = weight_rotation_loss_g,
                       use_cuda=use_cuda, gpu_num=gpu_num, print_every = print_every,
                       loss = loss,
                       gp_weight=gp_weight,
                       critic_iterations=critic_iterations,
                       save_FID = save_FID,
                       FIDPaths = [gen_img_path, real_img_path],
-                      ssup=ssup,
                       checkpoint_folder = checkpoint_folder,
                       plot_images=plot_images,
                       save_images=save_images,

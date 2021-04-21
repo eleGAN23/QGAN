@@ -17,12 +17,10 @@ from torch.nn import BatchNorm2d
 
 
 class SNGAN_D32(nn.Module):
-    def __init__(self, ssup, channel=3, spectral_normed=False):
+    def __init__(self, channel=3, spectral_normed=False):
         super(SNGAN_D32, self).__init__()
 
-        self.ssup = ssup
         self.spectral_normed = spectral_normed
-
         
         self.re1 = First_Residual_D(channel, 128, spectral_normed = spectral_normed)
         self.re2 = Residual_D(128, 128, down_sampling = True, spectral_normed = spectral_normed)
@@ -33,15 +31,6 @@ class SNGAN_D32(nn.Module):
         # # nn.init.xavier_uniform_(self.fully_connect_gan2.weight.data, 1.)
         # torch.nn.init.normal_(self.fully_connect_gan2.weight.data, std=0.02)
         self.fully_connect_gan2 = SNLinear(128, 1, bias=False, spectral_normed = spectral_normed)
-            
-        # self.fully_connect_rot2 = nn.Linear(128, 4, bias=False)
-        # # nn.init.xavier_uniform_(self.fully_connect_rot2.weight.data, 1.)
-        # torch.nn.init.normal_(self.fully_connect_rot2.weight.data, std=0.02)
-        self.fully_connect_rot2 = SNLinear(128, 4, bias=False, spectral_normed = spectral_normed)
-        
-        # if spectral_normed:
-        #     self.fully_connect_gan2 = spectral_norm(self.fully_connect_gan2)
-        #     self.fully_connect_rot2 = spectral_norm(self.fully_connect_rot2)
         
         self.sigmoid = nn.Sigmoid()
         self.softmax = nn.Softmax(dim=1)

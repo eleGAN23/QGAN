@@ -17,10 +17,9 @@ from utils.QBN_Vecchi2 import QuaternionBatchNorm2d as QBatchNorm
 
 
 class QSNGAN_QSN_D32(nn.Module):
-    def __init__(self, ssup, channel=4, spectral_normed=False):
+    def __init__(self, channel=4, spectral_normed=False):
         super(QSNGAN_QSN_D32, self).__init__()
 
-        self.ssup = ssup
         self.spectral_normed = spectral_normed
 
         
@@ -34,15 +33,6 @@ class QSNGAN_QSN_D32(nn.Module):
         # torch.nn.init.normal_(self.fully_connect_gan2.weight.data, std=0.02)
         self.fully_connect_gan2 = SNLinear(128, 1, bias=False, spectral_normed = spectral_normed)
             
-        # self.fully_connect_rot2 = nn.Linear(128, 4, bias=False)
-        # # nn.init.xavier_uniform_(self.fully_connect_rot2.weight.data, 1.)
-        # torch.nn.init.normal_(self.fully_connect_rot2.weight.data, std=0.02)
-        self.fully_connect_rot2 = SNLinear(128, 4, bias=False, spectral_normed = spectral_normed)
-        
-        # if spectral_normed:
-        #     self.fully_connect_gan2 = spectral_norm(self.fully_connect_gan2)
-        #     self.fully_connect_rot2 = spectral_norm(self.fully_connect_rot2)
-        
         self.sigmoid = nn.Sigmoid()
         self.softmax = nn.Softmax(dim=1)
         self.relu = nn.ReLU()
