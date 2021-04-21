@@ -43,7 +43,7 @@ if __name__ == '__main__':
     parser.add_argument('--normalize', type=bool, default=False, help='map value of images from range [0,255] to range [-1,1]')
     
     parser.add_argument('--model', type=str, default='DCGAN_64', help='Models: DCGAN_64, QDCGAN_64, SSGAN_32, QSSGAN_32, SSGAN_128, QSSGAN_128')
-    parser.add_argument('--ssup', type=bool, default=False, help='Add Rotation Loss')
+    parser.add_argument('--ssup', type=bool, default=False, help='Old option, set it False')
     parser.add_argument('--noise_dim', type=int, default=128)
     parser.add_argument('--BN', type=bool, default=False, help='Apply Batch Normalization')
     parser.add_argument('--SN', type=bool, default=False, help='Apply Spectral Normalization')    

@@ -86,8 +86,6 @@ class Trainer():
         self.selected_loss = loss
         if self.selected_loss == 'classic':
             self.BCE_loss = nn.BCELoss()
-        # if self.ssup:
-        #     self.CrossEntropy = nn.CrossEntropyLoss()
 
         
         self.save_FID = save_FID
@@ -105,16 +103,6 @@ class Trainer():
         
         
         self.QNet = ('Q' in self.G.__class__.__name__ ) # check if network is Quaternionic
-        
-        # if self.ssup:
-        #     if self.QNet:
-        #         self.G.apply(QSSweights_init)
-        #         self.D.apply(QSSweights_init)
-        #         print('QSSGAN Weights initialized')
-        #     else:
-        #         self.G.apply(SSweights_init)
-        #         self.D.apply(SSweights_init)
-        #         print('SSGAN Weights initialized')
         
         # init weight of DCGAN and QDCGAN
         if hasattr(self.G, 'needs_init') and hasattr(self.D, 'needs_init'):
@@ -161,21 +149,7 @@ class Trainer():
         # data divided in upright and rotated    
         # take first batch corresponding to the total images if the network is not self-supervised
         # or corresponding to the upright images if the network is self-supervised
-        self.D.zero_grad()
-
-        # Get Discriminator probabilities of rotated and not rotated images
-        if self.ssup:
-            rot_batch = (batch_size//4) * 4
-            generated_data = generated_data[:-rot_batch]
-
-            all_data = torch.cat([data, generated_data], dim=0)
-
-            sigmoid, logits, logits_rot, softmax_rot = self.D(all_data)
-
-            d_real_sigmoid, d_real_logits = sigmoid[0:batch_size], logits[0:batch_size]
-            d_real_rot_logits = logits_rot[batch_size:batch_size + rot_batch]
-            g_fake_sigmoid, g_fake_logits = sigmoid[batch_size + rot_batch:], logits[batch_size + rot_batch:]
-            
+        self.D.zero_grad()            
 
             
         else:
@@ -228,30 +202,6 @@ class Trainer():
                 d_loss == gradient_penalty
         
         
-        # Add auxiliary rotation loss
-        if self.ssup:
-            if self.weight_rotation_loss_d > 0:
-                
-                rot_labels = torch.zeros(rot_batch).long().to(self.device)
-                for i in range(rot_batch):
-                    if i < rot_batch//4:
-                        rot_labels[i] = 0
-                    elif i < rot_batch//2:
-                        rot_labels[i] = 1
-                    elif i < 3*(rot_batch//4):
-                        rot_labels[i] = 2
-                    else:
-                        rot_labels[i] = 3
-                        
-                d_real_class_loss = F.cross_entropy(
-                                        input = d_real_rot_logits,
-                                        target = rot_labels)
-
-                d_loss += self.weight_rotation_loss_d * d_real_class_loss
-                self.losses['RotationD'].append(self.weight_rotation_loss_d * d_real_class_loss.item())
-        
-                
-        
         if self.selected_loss != 'classic':
             d_loss.backward()#retain_graph=True)
             
@@ -267,16 +217,7 @@ class Trainer():
         # print('gen data size', generated_data.shape)
         self.G.zero_grad()
         
-        # Get probabilities and logits from ssup Discriminator
-        if self.ssup:
-            rot_batch = (batch_size//4) * 4
-            sigmoid, logits, logits_rot, _ = self.D(generated_data)
-            
-            g_fake_sigmoid, g_fake_logits = sigmoid[0:batch_size], logits[0:batch_size]
-            g_fake_rot_logits = logits_rot[batch_size:]
-             
-        else:
-            g_fake_sigmoid, g_fake_logits = self.D(generated_data)
+        g_fake_sigmoid, g_fake_logits = self.D(generated_data)
             
             
         
@@ -287,31 +228,6 @@ class Trainer():
             # self.label.fill_(1.)
             # print(g_fake_sigmoid.view(-1).shape)
             g_loss = self.BCE_loss(g_fake_sigmoid.view(-1), self.label_one)
-
-        
-        # Add auxiliary rotation loss
-        if self.ssup:
-            if self.weight_rotation_loss_g > 0:
-                
-                # prepare labels
-                rot_labels = torch.zeros(rot_batch).long().to(self.device)
-                for i in range(rot_batch):
-                    if i < rot_batch//4:
-                        rot_labels[i] = 0
-                    elif i < rot_batch//2:
-                        rot_labels[i] = 1
-                    elif i < 3*(rot_batch//4):
-                        rot_labels[i] = 2
-                    else:
-                        rot_labels[i] = 3
-                
-                # Generator Auxiliary Rotation Loss
-                g_fake_class_loss = F.cross_entropy(
-                                                input = g_fake_rot_logits, 
-                                                target = rot_labels)
-                # print('g_fake_class_loss', g_fake_class_loss.shape)
-                g_loss += self.weight_rotation_loss_g * g_fake_class_loss
-                self.losses['RotationG'].append(self.weight_rotation_loss_g * g_fake_class_loss.item())
                 
         g_loss.backward()
         self.G_opt.step()
@@ -328,10 +244,7 @@ class Trainer():
         interpolated = Variable( alpha * real_data + (1 - alpha) * generated_data, requires_grad=True).to(self.device)
 
         # Compute probability of interpolated examples
-        if self.ssup:
-            _, logit_interpolated, _, _ = self.D(interpolated)
-        else:
-            _, logit_interpolated = self.D(interpolated)
+        _, logit_interpolated = self.D(interpolated)
             
         out_interpolated_batch = logit_interpolated.size()
         
@@ -368,26 +281,6 @@ class Trainer():
             batch_size = data.size(0)
             generated_data = self.sample_generator(batch_size)
                         
-            # Generate rotated real images and rotated fake images
-            if self.ssup:
-                xG = generated_data
-                xD = data
-
-                rot_slice = batch_size // 4
-                # rot_batch = rot_slice *4
-                x_0 = xG[0:rot_slice]
-                x_90 = torch.rot90(xG[rot_slice:2*rot_slice],1,(3,2))
-                x_180 = torch.rot90(xG[2*rot_slice:3*rot_slice],2,(3,2))
-                x_270 = torch.rot90(xG[3*rot_slice:4*rot_slice],3,(3,2))
-                generated_data = torch.cat((xG, x_0, x_90, x_180, x_270),0)
-                
-                x_0 = xD[0:rot_slice]
-                x_90 = torch.rot90(xD[rot_slice:2*rot_slice],1,(3,2))
-                x_180 = torch.rot90(xD[2*rot_slice:3*rot_slice],2,(3,2))
-                x_270 = torch.rot90(xD[3*rot_slice:4*rot_slice],3,(3,2))
-                data = torch.cat((xD, x_0, x_90, x_180, x_270),0)
-                
-                
             # Prepare labels for classic loss
             if self.selected_loss == 'classic':
                 self.label_one = torch.full((batch_size,), 1, dtype=torch.float, device=self.device)
@@ -409,13 +302,9 @@ class Trainer():
                 print()
                 print("Iteration {}".format(self.num_steps))
                 print("Total Loss D: {}".format(self.losses['LossD'][-1]))
-                if self.ssup:
-                    print("Rotation Loss D: {}".format(self.losses['RotationD'][-1]))
                     
                 if len(self.losses['LossG']) !=0:
                     print("Total Loss G: {}".format(self.losses['LossG'][-1]))
-                    if self.ssup:
-                        print("Rotation Loss G: {}".format(self.losses['RotationG'][-1]))
                 if self.gp_weight !=0:
                     print("GP: {}".format(self.losses['GP'][-1]))
                 
