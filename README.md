@@ -9,10 +9,10 @@ Latest Generative Adversarial Networks (GANs) are gathering outstanding results 
 
 ### Results
 
-![SNGAN generated samples from the CelebA-HQ dataset.](./samples/CelebAHQ-SNGAN.png "SNGAN generated samples from the CelebA-HQ dataset." =200x200)
-![Proposed QSNGAN generated samples from the CelebA-HQ dataset.](./samples/CelebAHQ-QSNGAN_QSN.png "Proposed QSNGAN generated samples from the CelebA-HQ dataset.")
+![](./samples/CelebAHQ-SNGAN.png  | width=200)
+![](./samples/CelebAHQ-QSNGAN_QSN.png "Proposed QSNGAN generated samples from the CelebA-HQ dataset.")
 
-![SNGAN generated samples from the 102 Oxford Flowers dataset.](./samples/flowers-SNGAN.png "SNGAN generated samples from the 102 Oxford Flowers dataset.")
-![Proposed QSNGAN generated samples from the 102 Oxford Flowers dataset.](./samples/flowers-QSNGAN_QSN.png "Proposed QSNGAN generated samples from the 102 Oxford Flowers dataset.")
+![](./samples/flowers-SNGAN.png "SNGAN generated samples from the 102 Oxford Flowers dataset.")
+![](./samples/flowers-QSNGAN_QSN.png "Proposed QSNGAN generated samples from the 102 Oxford Flowers dataset.")
 ### Training
 
