@@ -27,8 +27,11 @@ Samples generated from the real-valued SNGAN on the left and from the proposed Q
 
 ### Training
 
-Please install the `requirements.txt` file. Download the dataset and set the name and the path in the `.txt` file. Images are resized by default to 128x128 if not set differently. Default Dataloaders are set up for CelebA-HQ, 102 Oxford Flowers and CIFAR10. For the latter set `image_size=32` and the model either `SNGAN_32` or `QSNGAN_QSN_32`.
-The files `SNGAN_128.txt` and `QSNGAN_128.txt` contain the configurations and options for training. Then, training can be performed through:
+The files `SNGAN_128.txt` and `QSNGAN_128.txt` contain the configurations and options for training.
+
+Please install the `requirements.txt` file. Download the dataset and set the name and the path in the `.txt` configuration file. Images are resized by default to 128x128 if not set differently. Default Dataloaders are set up for CelebA-HQ, 102 Oxford Flowers and CIFAR10. For the latter set `image_size=32` and the model either `SNGAN_32` or `QSNGAN_QSN_32`.
+
+Training can be performed through:
 
 ```python
 python Qmain_FromText.py --TextArgs=*choose-the-txt-file*
