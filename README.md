@@ -11,7 +11,7 @@ Latest Generative Adversarial Networks (GANs) are gathering outstanding results 
 
 Summary parameters and memory results for SNGAN and QSNGAN.
 
-| Model  | # Total parameters | Disk Memory*^|
+| Model  | # Total parameters | Disk Memory^|
 |--------|:------------------:|:---------:|
 | SNGAN  |     61,173,000     |   115 GB  |
 | QSNGAN |     16,896,105     |   35 GB   |
