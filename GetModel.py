@@ -33,6 +33,6 @@ def GetModel(str_model,  z_size , BN=False, SN=False, ssup=False, needs_init=Tru
     
     else:
         raise ValueError ('Model not implemented, check allowed models (-help) \n \
-             Models: DCGAN_64, QDCGAN_64, SSGAN_32, QSSGAN_32, SSGAN_128, QSSGAN_128')
+             Models: SNGAN_32, QSNGAN_QSN_32, SNGAN_128, QSNGAN_128_QSN')
         
         
