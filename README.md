@@ -9,6 +9,8 @@ Latest Generative Adversarial Networks (GANs) are gathering outstanding results 
 
 ### Results
 
+<img src="./samples/CelebAHQ-SNGAN.png" width="200" height="200"/>
+
 ![](./samples/CelebAHQ-SNGAN.png  | width=200)
 ![](./samples/CelebAHQ-QSNGAN_QSN.png "Proposed QSNGAN generated samples from the CelebA-HQ dataset.")
 
