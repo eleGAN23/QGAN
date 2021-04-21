@@ -9,8 +9,8 @@ Latest Generative Adversarial Networks (GANs) are gathering outstanding results 
 
 ### Results
 
-![SNGAN generated samples from the CelebA-HQ dataset.](https://github.com/eleGAN23/QGAN/blob/main/samples/CelebAHQ-SNGAN.pdf "SNGAN generated samples from the CelebA-HQ dataset.")
-![Proposed QSNGAN generated samples from the CelebA-HQ dataset.](https://github.com/eleGAN23/QGAN/blob/main/samples/CelebAHQ-QSNGAN_QSN.pdf "Proposed QSNGAN generated samples from the CelebA-HQ dataset.")
+![SNGAN generated samples from the CelebA-HQ dataset.](./samples/CelebAHQ-SNGAN.png "SNGAN generated samples from the CelebA-HQ dataset.")
+![Proposed QSNGAN generated samples from the CelebA-HQ dataset.](./samples/CelebAHQ-QSNGAN_QSN.png "Proposed QSNGAN generated samples from the CelebA-HQ dataset.")
 
 ### Training
 
