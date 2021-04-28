@@ -52,4 +52,8 @@ Please cite our work if you found it useful:
 }
 ```
 
+#### Interested in Quaternion Generative Models?
+
+Check also the Quaternion-Valued Variational Autoencoder at ICASSP 2021 [[Paper](https://arxiv.org/pdf/2010.11647.pdf)] [[GitHub](https://github.com/eleGAN23/QVAE)].
+
 
