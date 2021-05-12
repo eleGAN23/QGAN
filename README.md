@@ -41,7 +41,7 @@ python Qmain_FromText.py --TextArgs=*choose-the-txt-file*
 
 <img src="./samples/quaternion_conv_filters.png" width="433" height="550"/>
 
-Quaternion convolutions adjust the kernels of the convolution to reproduce the Hamilton product. In the figure below you can see how the real-valued convolution needs a different filter for each input channel, while quaternion convolution share the filters among inputs. You can found a detailed description in the [paper](https://arxiv.org/pdf/2104.09630.pdf).
+Quaternion convolutions adjust the kernels of the convolution to reproduce the Hamilton product. The figure above shows real-valued filters and wuaternion-valued filters for a generic layer with 4 channels in input and 8 channels in output. In the figure you can see how the real-valued convolution needs a different filter for each input channel, while quaternion convolution share the filters among inputs. You can found a detailed description in the [paper](https://arxiv.org/pdf/2104.09630.pdf).
 
 
 ### Cite
