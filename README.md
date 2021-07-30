@@ -1,7 +1,7 @@
 # QGAN
 Official PyTorch repository for:
 
-Eleonora Grassucci, Edoardo Cicero, Danilo Comminiello, "[Quaternion Generative Adversarial Networks](https://arxiv.org/pdf/2104.09630.pdf)", <i>arXiv preprint: arXiv:2104.09630v1</i>, Apr. 2021.
+Eleonora Grassucci, Edoardo Cicero, Danilo Comminiello, "[Quaternion Generative Adversarial Networks](https://arxiv.org/pdf/2104.09630.pdf)", <i>arXiv preprint: arXiv:2104.09630v2</i>, Apr. 2021.
 
 ### Abstract
 
@@ -61,6 +61,9 @@ Please cite our work if you found it useful:
 
 #### Interested in Quaternion Generative Models?
 
-Check also the Quaternion-Valued Variational Autoencoder at ICASSP 2021 [[Paper](https://arxiv.org/pdf/2010.11647.pdf)] [[GitHub](https://github.com/eleGAN23/QVAE)].
+Check also: 
+
+* Quaternion-Valued Variational Autoencoder, ICASSP, 2021 [[Paper](https://arxiv.org/pdf/2010.11647.pdf)] [[GitHub](https://github.com/eleGAN23/QVAE)].
+* An Information-Theoretic Perspective on Proper Quaternion Variational Autoencoders, Entropy, 2021 [[Paper](https://www.mdpi.com/1099-4300/23/7/856)] [[GitHub](https://github.com/eleGAN23/QVAE)].
 
 
