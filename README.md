@@ -1,7 +1,7 @@
 # Quaternion Generative Adversarial Networks
 Official PyTorch repository for:
 
-Eleonora Grassucci, Edoardo Cicero, Danilo Comminiello, "[Quaternion Generative Adversarial Networks](https://arxiv.org/pdf/2104.09630.pdf)", accepted as contribution to <i>Generative Adversarial Learning: Architectures and Applications</i>, editors:  Dr Roozbeh Razavi-Far, Dr Ariel Ruiz-Garcia, Professor Vasile Palade, Professor Jürgen Schmidhuber, Springer, Sept. 2021.
+Eleonora Grassucci, Edoardo Cicero, Danilo Comminiello, "[Quaternion Generative Adversarial Networks](https://arxiv.org/pdf/2104.09630.pdf)", <i>[Generative Adversarial Learning: Architectures and Applications](https://link.springer.com/book/10.1007/978-3-030-91390-8#toc)</i>, editors:  Dr Roozbeh Razavi-Far, Dr Ariel Ruiz-Garcia, Professor Vasile Palade, Professor Jürgen Schmidhuber, Springer, Sept. 2021.
 
 ### Abstract
 
