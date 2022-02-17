@@ -66,5 +66,6 @@ Check also:
 * Lightweight Convolutional Neural Network by Hypercomplex Parameterization, Under Review at ICLR2021, 2021 [[Paper](https://arxiv.org/pdf/2110.04176.pdf)] [[GitHub](https://github.com/elegan23/hypernets)].
 * Quaternion-Valued Variational Autoencoder, ICASSP, 2021 [[Paper](https://arxiv.org/pdf/2010.11647.pdf)] [[GitHub](https://github.com/eleGAN23/QVAE)].
 * An Information-Theoretic Perspective on Proper Quaternion Variational Autoencoders, Entropy, 2021 [[Paper](https://www.mdpi.com/1099-4300/23/7/856)] [[GitHub](https://github.com/eleGAN23/QVAE)].
+* Hypercomplex Image-to-Image Translation, under review, 2022 [[GitHub](https://github.com/eleGAN23/HI2I)].
 
 
